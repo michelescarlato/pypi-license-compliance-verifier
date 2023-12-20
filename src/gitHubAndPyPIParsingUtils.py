@@ -45,12 +45,22 @@ def iterdict(d, package_name):
 
 
 def retrieve_github_api_url(github_url):
+    repo = ""
+    owner = ""
+    github_url_api = ""
     parts = urlparse(github_url)
     directories = parts.path.strip('/').split('/')
-    owner = directories[0]
-    repo = directories[1]
-    github_url = "https://api.github.com/repos/" + owner + "/" + repo + "/license"
-    return github_url
+    try:
+        owner = directories[0]
+    except IndexError:
+        pass
+    try:
+        repo = directories[1]
+    except IndexError:
+        pass
+    if repo != "" and owner != "":
+        github_url_api: str = "https://api.github.com/repos/" + owner + "/" + repo + "/license"
+    return github_url_api
 
 
 def retrieve_license_from_github(github_api_url):
@@ -112,7 +122,6 @@ def retrieve_license_information_from_pypi(package_name, package_version):
             if PyPILicense is not None:
                 if len(PyPILicense) > 0:
                     if not IsAnSPDX(PyPILicense):
-                        # SPDXConversion = convert_to_spdx(PyPILicense, lcv_url)
                         SPDXConversion = ConvertToSPDX(PyPILicense)
                         if IsAnSPDX(SPDXConversion):
                             PyPILicenseSPDX = SPDXConversion
