@@ -101,8 +101,6 @@ class OSADLVerification:
         verificationList = list()
         keys = ["message", "status", "inbound", "outbound", "inbound_SPDX", "outbound_SPDX"]
         dictOutput = dict.fromkeys(keys, None)
-        print(inbound_licenses_cleaned)
-        print(outbound_license)
         with open("lcvlib/matrixseqexpl.json", "r") as file:
             jsonData = json.load(file)
         for inbound_license in inbound_licenses_cleaned:  # remove unsupported inbound_licenses
