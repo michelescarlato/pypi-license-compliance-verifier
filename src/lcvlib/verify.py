@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 from .SPDXIdMapping import ConvertToSPDX, IsAnSPDX
-from .verify_osadl import verify_osadl_matrix, verify_osadl_json
+from .verify_osadl import OSADLVerification
 
 '''
 * SPDX-FileCopyrightText: 2021 Michele Scarlato <michele.scarlato@endocode.com>
@@ -54,9 +54,9 @@ def compare_osadl(inbound_licenses, outbound_license):
             inbound_licenses.remove(inbound_license)
     print(inbound_licenses)
     print(supported_licenses_OSADL)
-    #verificationList = verify_osadl_matrix(
+    #verificationList = OSADLVerification.verify_osadl_matrix(
      #   InboundLicenses_SPDX, OutboundLicense_SPDX, OutboundLicense)
-    verificationList = verify_osadl_json(
+    verificationList = OSADLVerification.verify_osadl_json(
         InboundLicenses_SPDX, OutboundLicense_SPDX, outbound_license)
     verificationList = parse_verification_list(verificationList)
     return verificationList
