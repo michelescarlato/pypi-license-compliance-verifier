@@ -21,7 +21,7 @@ class DependenciesTree:
             dependencies_tree_json_path = join(getcwd(), project_name)
             f = open(f"{dependencies_tree_json_path}/dependencies_tree.json", "w")
             subprocess.run(['pipdeptree', '--json-tree'], cwd=venv_dir, stdout=f)
-            print(type(f))
+        subprocess.run(['rm', '-rf', venv_dir])  # delete the created venv
         return f
 
     @staticmethod
@@ -39,6 +39,9 @@ class DependenciesTree:
                             if len(dependency['dependencies']) > 0:
                                 for dependency in dependency['dependencies']:
                                     DependenciesTree.collect_dependency_license(dependency)
+                                    if len(dependency['dependencies']) > 0:
+                                        for dependency in dependency['dependencies']:
+                                            DependenciesTree.collect_dependency_license(dependency)
         dependencies_tree_path = dependencies_tree_path.replace('.json', '')
         with open(f'{dependencies_tree_path}_with_licenses.json', "w") as jsonFile:
             json.dump(dep_tree, jsonFile, indent=4)
