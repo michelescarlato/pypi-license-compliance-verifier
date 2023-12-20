@@ -52,8 +52,6 @@ def compare_osadl(inbound_licenses, outbound_license):
     for inbound_license in inbound_licenses:
         if inbound_license not in supported_licenses_OSADL:
             inbound_licenses.remove(inbound_license)
-    print(inbound_licenses)
-    print(supported_licenses_OSADL)
     #verificationList = OSADLVerification.verify_osadl_matrix(
      #   InboundLicenses_SPDX, OutboundLicense_SPDX, OutboundLicense)
     verificationList = OSADLVerification.verify_osadl_json(
@@ -81,5 +79,5 @@ def parse_verification_list(verification_list: dict):
     if indexLicense == len(verification_list):
         print("Hence your project is compatible.")
     else:
-        print("Hence your project is not compatible.")
+        print("Hence your project may not be compatible.")
     return verification_list
