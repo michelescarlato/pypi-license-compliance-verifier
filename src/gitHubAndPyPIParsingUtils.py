@@ -53,7 +53,7 @@ def retrieve_github_api_url(github_url):
     return github_url
 
 
-def retrieve_license_from_github(github_api_url, lcv_url):
+def retrieve_license_from_github(github_api_url):
     GitHubLicense = ""
     GitHubLicenseSPDX = ""
     try:
@@ -65,14 +65,10 @@ def retrieve_license_from_github(github_api_url, lcv_url):
                 GitHubLicense = (jsonResponse["license"]["key"])
             if len(GitHubLicense) == 0:
                 GitHubLicense = (jsonResponse["license"]["name"])
-            # here a call to the LCV endpoint convertToSPDX endpoint should be performed
             if len(GitHubLicense) > 0:
-                # check if the retrieved license is an SPDX id
-                IsSPDX = is_an_spdx(GitHubLicense, lcv_url)
-                if not IsSPDX:
-                    SPDXConversion = convert_to_spdx(GitHubLicense, lcv_url)
-                    IsSPDX = is_an_spdx(SPDXConversion, lcv_url)
-                    if IsSPDX:
+                if not IsAnSPDX(GitHubLicense):
+                    SPDXConversion = ConvertToSPDX(GitHubLicense)
+                    if IsAnSPDX(GitHubLicense):
                         GitHubLicenseSPDX = SPDXConversion
                 else:
                     GitHubLicenseSPDX = GitHubLicense
@@ -83,7 +79,6 @@ def retrieve_license_from_github(github_api_url, lcv_url):
     except requests.exceptions.ConnectionError:
         print('Connection timeout: ConnectError')
         time.sleep(30)
-
     return GitHubLicense, GitHubLicenseSPDX
 
 
@@ -106,25 +101,7 @@ def is_an_spdx(license_name, lcv_url):
     return LCVIsAnSPDXJsonResponse
 
 
-def convert_to_spdx(license_name, lcv_url):
-    LCVConvertToSPDXurl = f'{lcv_url}ConvertToSPDX?VerboseLicense={license_name}'
-    try:
-        response = requests.get(url=LCVConvertToSPDXurl)  # get Call Graph for specified package
-        if response.status_code == 200:
-            LCVConvertToSPDXJsonResponse = response.json()
-        if response.status_code == 414:
-            LCVConvertToSPDXJsonResponse = "Too long license name"
-    except requests.exceptions.ReadTimeout:
-        print('Connection timeout: ReadTimeout')
-    except requests.exceptions.ConnectTimeout:
-        print('Connection timeout: ConnectTimeout')
-    except requests.exceptions.ConnectionError:
-        print('Connection timeout: ConnectError')
-        time.sleep(30)
-    return LCVConvertToSPDXJsonResponse
-
-
-def retrieve_license_information_from_pypi(package_name, package_version, lcv_url):
+def retrieve_license_information_from_pypi(package_name, package_version):
     URL = f'https://pypi.org/pypi/{package_name}/{package_version}/json'
     PyPILicenseSPDX = ""
     try:
@@ -134,10 +111,10 @@ def retrieve_license_information_from_pypi(package_name, package_version, lcv_ur
             PyPILicense = (jsonResponse["info"]["license"])
             if PyPILicense is not None:
                 if len(PyPILicense) > 0:
-                    if not IsAnSPDX(PyPILicense): #, lcv_url):
+                    if not IsAnSPDX(PyPILicense):
                         # SPDXConversion = convert_to_spdx(PyPILicense, lcv_url)
                         SPDXConversion = ConvertToSPDX(PyPILicense)
-                        if IsAnSPDX(SPDXConversion): #, lcv_url):
+                        if IsAnSPDX(SPDXConversion):
                             PyPILicenseSPDX = SPDXConversion
                     else:
                         PyPILicenseSPDX = PyPILicense
@@ -148,7 +125,4 @@ def retrieve_license_information_from_pypi(package_name, package_version, lcv_ur
     except requests.exceptions.ConnectionError:
         print('Connection timeout: ConnectError')
         time.sleep(30)
-    return PyPILicenseSPDX, PyPILicenseSPDX, jsonResponse
-
-
-
+    return PyPILicense, PyPILicenseSPDX, jsonResponse
