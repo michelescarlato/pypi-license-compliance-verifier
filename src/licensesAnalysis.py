@@ -1,6 +1,7 @@
 from retrieveLocallyLicensesInformation import ReceiveLocallyLicensesInformation
-from licenseComplianceVerification import (generate_inbound_license_set, license_compliance_verification,
-                                           parse_lcv_assessment_response, parse_license_declared)
+from licenseComplianceVerification import (generate_inbound_license_set, parse_lcv_assessment_response,
+                                           parse_license_declared)
+from lcvlib.verify import compare_osadl
 '''
 * SPDX-FileCopyrightText: 2023 Michele Scarlato
 *
@@ -8,14 +9,13 @@ from licenseComplianceVerification import (generate_inbound_license_set, license
 '''
 
 
-def licenses_analysis(args, package_list, lcv_url):
+def licenses_analysis(args, package_list):
     print("Start license analysis...")
-    # added to skip FASTEN queries
     index = 0
-    licenses_retrieved = ReceiveLocallyLicensesInformation.receive_locally_licenses_information(package_list, lcv_url, index)
+    licenses_retrieved = ReceiveLocallyLicensesInformation.receive_locally_licenses_information(package_list, index)
     inbound_licenses = generate_inbound_license_set(licenses_retrieved)
     outbound_license = args.spdx_license
-    lcv_assessment_response = license_compliance_verification(inbound_licenses, outbound_license, lcv_url)
+    lcv_assessment_response = compare_osadl(inbound_licenses, outbound_license)
     license_report = parse_lcv_assessment_response(lcv_assessment_response, licenses_retrieved)
     license_declared_report = parse_license_declared(licenses_retrieved)
     full_report = "Report about licenses:\n"
