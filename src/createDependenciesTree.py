@@ -3,25 +3,38 @@ import shutil
 import json
 from os.path import join
 from os import getcwd
-from subprocess import run
+from subprocess import run, Popen, PIPE, STDOUT
 from activate_virtualenv import activate_virtualenv
 from retrieveLocallyLicensesInformation import ReceiveLocallyLicensesInformation
+from pypi_lcv_logging import logger
 
 
 class DependenciesTree:
     @staticmethod
     def create_dependencies_tree(requirements_txt, project_name):
         venv_dir = join(getcwd(), f'venv-{project_name}')
-        subprocess.run(['python3', '-m', 'venv', f'venv-{project_name}'])
-        shutil.copyfile('./activate_this.py', f'{venv_dir}/bin/activate_this.py')
+        result = subprocess.run(['python3', '-m', 'venv', f'venv-{project_name}'],  stdout=PIPE, stderr=STDOUT)
+        logger.info(f'python3 -m venv venv-{project_name}')
+        logger.info(result.stdout)
+        try:
+            shutil.copyfile('./activate_this.py', f'{venv_dir}/bin/activate_this.py')
+        except IOError as e:
+            logger.info("Unable to copy file. %s" % e)
         pip3_venv = f'{venv_dir}/bin/pip3'
         with activate_virtualenv(venv_dir):  # run pip install and pipdeptree inside the virtualenv
-            run([pip3_venv, "install", "-r", join(getcwd(), requirements_txt)], cwd=venv_dir)
-            run([pip3_venv, "install", 'pipdeptree'], cwd=venv_dir)
+            result = subprocess.run([pip3_venv, "install", "-r", join(getcwd(), requirements_txt)], cwd=venv_dir,
+                                    stdout=PIPE, stderr=STDOUT)
+            logger.info(f'pip3 install -r {join(getcwd(), requirements_txt)}')
+            logger.info(result.stdout)
+            subprocess.run([pip3_venv, "install", 'pipdeptree'], cwd=venv_dir, stdout=PIPE, stderr=STDOUT)
             dependencies_tree_json_path = join(getcwd(), project_name)
             f = open(f"{dependencies_tree_json_path}/dependencies_tree.json", "w")
-            subprocess.run(['pipdeptree', '--json-tree'], cwd=venv_dir, stdout=f)
-        subprocess.run(['rm', '-rf', venv_dir])  # delete the created venv
+            result = subprocess.run(['pipdeptree', '--json-tree'], cwd=venv_dir, stdout=f, stderr=STDOUT)
+            logger.info(f'pipdeptree --json-tree')
+            logger.info(result.stderr)
+        result = subprocess.run(['rm', '-rf', venv_dir], stdout=PIPE, stderr=STDOUT)  # delete the created venv
+        logger.info(f'rm -rf {venv_dir}')
+        logger.info(result.stdout)
         return f
 
     @staticmethod
@@ -49,7 +62,7 @@ class DependenciesTree:
 
     @staticmethod
     def collect_dependency_license(dependency):
-        print(dependency['package_name'])
+        logger.info(dependency['package_name'])
         PyPILicense, PyPILicenseSPDX, GitHubLicense, GitHubLicenseSPDX \
             = (ReceiveLocallyLicensesInformation.
                 receive_locally_licenses_information_single_package(
@@ -59,4 +72,3 @@ class DependenciesTree:
         dependency['GitHubLicense'] = GitHubLicense
         dependency['GitHubLicenseSPDX'] = GitHubLicenseSPDX
         dependency['dependencies'] = dependency.pop('dependencies')
-        return
