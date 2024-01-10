@@ -10,9 +10,8 @@ It aims at providing an Open Source licensing assessment of the direct and trans
 
 1. Clone the repository.
 
-2. (optional) create a virtual environment
+2. (optional) create a virtual environment e.g.:
 
-3. e.g.
 ```bash
 python3 -m venv venv
 source venv/bin/activate
@@ -24,14 +23,22 @@ source venv/bin/activate
 pip3 -r install requirements.txt
 ```
 
-5. Put the requirements.txt that you want to analyze inside a path, and specify it in the cli arguments:
+5. Put the `requirements.txt` that you want to analyze inside a path, and specify it in the cli arguments, 
+furthermore specify the outbound license chosen for your project with `--spdx_license=YourSPDXLicense`, 
+and provide the project name using `--product=yourProjectName` (a directory containing the dependency tree JSON and the augmented one will be created using `yourProjectName`)  :
 
 ```bash
 cd src
 python3 main.py --requirements pypi-lcv/requirements_example.txt --spdx_license=Apache2.0 --product=pypi-lcv
 ```
 
-The above requirements.txt will perform a compliance assessment of this tool.
+### Great! Do you want to test it?
+The `requirements.txt` specified in the example above is the one used to install the pypi license compliance verifier.
+Running the previous command, you will perform a compliance assessment of this tool, and it can be used as a functioning example.
+Try it out!
+
+You will discover that also this project has some licensing issue. There have been detected LGPL-3.0-or-later and MPL-2.0 dependencies.
+
 
 Note: the `pipdeptree` dependencies tree resolution provides a deeper dependency resolution than the [pypi-resolver](https://pypi.org/project/pypi-resolver/)'s one.
 Currently, the license compliance verification assessment is made upon the dependency resolved by the pypi-resolver.
