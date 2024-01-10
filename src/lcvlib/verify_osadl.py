@@ -131,10 +131,10 @@ class OSADLVerification:
                 return verificationList
             for inbound_license in inbound_licenses_cleaned:
                 print(f'Outbound license: {outbound_license}, inbound license: {inbound_license}')
-                for outbound_license in jsonData['licenses']:
-                    if outbound_license["name"] == outbound_license:
-                        print(outbound_license["name"])
-                        for inbound_license_json_element in outbound_license["compatibilities"]:
+                for outbound_license_dict in jsonData['licenses']:
+                    if outbound_license_dict["name"] == outbound_license:
+                        print(outbound_license_dict["name"])
+                        for inbound_license_json_element in outbound_license_dict["compatibilities"]:
                             if inbound_license_json_element["name"] == inbound_license:
                                 print(inbound_license_json_element["name"])
                                 comparison = inbound_license_json_element["compatibility"]
