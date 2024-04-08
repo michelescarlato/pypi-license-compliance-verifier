@@ -20,7 +20,7 @@ source venv/bin/activate
 4. Install the dependencies with:
 
 ```bash
-pip3 -r install requirements.txt
+pip3 install -r requirements.txt
 ```
 
 5. Put the `requirements.txt` that you want to analyze inside a path, and specify it in the cli arguments, 
