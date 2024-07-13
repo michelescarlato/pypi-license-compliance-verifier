@@ -7,3 +7,4 @@ fpdf==1.7.2
 pandas
 activate_virtualenv
 virtualenv
+web3
