@@ -20,9 +20,9 @@ class ReceiveLocallyLicensesInformation:
                 licenses[i]['packageVersion'] = package['version']
                 PyPILicense, PyPILicenseSPDX, jsonResponse = (
                     retrieve_license_information_from_pypi(package['name'], package['version']))
-                if len(PyPILicense) > 0:
+                if PyPILicense is not None and len(PyPILicense) > 0:
                     licenses[i]['PyPILicense'] = PyPILicense
-                if len(PyPILicenseSPDX) > 0:
+                if PyPILicenseSPDX is not None and len(PyPILicenseSPDX) > 0:
                     licenses[i]['PyPILicenseSPDX'] = PyPILicenseSPDX
                 GitHubURL = retrieve_github_url(jsonResponse, package['name'])
                 if GitHubURL is not None and len(GitHubURL) > 0:
